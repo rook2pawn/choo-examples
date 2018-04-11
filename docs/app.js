@@ -25,4 +25,4 @@ app.use((state, emitter) => {
   }, 500)
 })
 app.route('/choo-examples', mainView)
-app.mount('body')
+app.mount('div#main')

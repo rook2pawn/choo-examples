@@ -7,6 +7,89 @@ button {
 </style>
 <body>
 
+<div id='main'></div>
+<h2 id="nestedbuttonsexample">Nested buttons example</h2>
+
+<pre><code class="javascript language-javascript">var choo = require('choo')
+var html = require('choo/html')
+var Nanocomponent = require('nanocomponent')
+
+class Button extends Nanocomponent {
+  constructor () {
+    super()
+    this.button = null
+  }
+
+  createElement (button) {
+    // important we use a copy because if we change state
+    // later we don't want that to effect this directly
+    this.button = Object.assign({}, button);
+    return html`
+      &lt;button style="background-color: ${button.backgroundColor}; color: ${button.color}"&gt;
+        Click Me
+      &lt;/button&gt;
+    `
+  }
+
+  update (newButton) {
+    return newButton.backgroundColor !== this.button.backgroundColor
+  }
+}
+
+class ButtonManager extends Nanocomponent {
+  constructor () {
+    super()
+    this.buttons = null
+  }
+
+  createElement (buttons) {
+    this.buttons = buttons.map((button) =&gt; new Button)
+    return html`&lt;div&gt;${this.buttons.map((button,idx) =&gt; button.render(buttons[idx]))}&lt;/div&gt;`
+  }
+
+  update (newButtons) {
+    newButtons.forEach((newButton,idx) =&gt; {
+      this.buttons[idx].render(newButton)
+    })
+    return false;
+  }
+}
+
+var bm = new ButtonManager;
+var app = choo()
+app.route('/', mainView)
+app.mount('body')
+
+
+var mr = require('mrcolor');
+const invert = require('invert-color');
+
+var getColor = mr();
+const getRandomColor = function() {
+  var color = getColor().rgb();
+
+  var foregroundColor= invert(color)
+  var backgroundColor = `rgb(${color.join(',')})`;
+  return {color:foregroundColor, backgroundColor}
+}
+
+app.use((state, emitter) =&gt; {
+  state.buttons = Array(5).fill().map(() =&gt; getRandomColor());
+  setInterval(() =&gt; {
+    const index = ~~(Math.random()*state.buttons.length)
+    const colorObj = getRandomColor();
+    state.buttons[index].color = colorObj.color;
+    state.buttons[index].backgroundColor = colorObj.backgroundColor;
+    emitter.emit('render');
+  }, 500)
+})
+function mainView (state, emit) {
+  return html`&lt;body&gt;
+  ${bm.render(state.buttons)}
+  &lt;/body&gt;`
+}
+</code></pre>
+
 	<script src="bundle.js"></script>
 </body>
 </html>
