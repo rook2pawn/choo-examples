@@ -2,6 +2,10 @@
 
 What I love about `choo` is how simple it is.
 
+See [nested buttons with nanocomponent in action](https://rook2pawn.github.io/choo-examples/)
+
+
+
 ## Table of contents
 1. [Choo in sixty seconds](#choo-in-sixty-seconds)
 2. [Nanocomponent in sixty seconds](#nanocomponent-in-sixty-seconds)
