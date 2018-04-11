@@ -1,17 +1,40 @@
 <html>
-<head></head>
+<head>
+	<script src="materialize.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="materialize.min.css">
+</head>
 <style>
+pre {
+  background-color:#efefef;
+  border-radius:7px;
+  padding-left:20px;
+}
+.content {
+  padding-top:2em;
+}
 button {
 	font-size:20px;
 }
 </style>
 <body>
+  <nav>
+    <div class="nav-wrapper">
+      <div class="container">
+        <a href="https://github.com/rook2pawn/choo-examples" class="brand-logo right"><img style="margin-right: 20px;margin-top: 16px;" src="GitHub-Mark-32px.png"></a>
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+          <li><a href="#">Nanocomponent Nested Buttons</a></li>
+          <li><a href="">Components</a></li>
+          <li><a href="collapsible.html">JavaScript</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class='container content'>
+  	<div id="nestedbuttonsexample"></div>
+  	<h2>Nested buttons example</h2>
 
-Visit the <a href="https://github.com/rook2pawn/choo-examples">repository</a> for complete examples! 
-<div id='main'></div>
-<h2 id="nestedbuttonsexample">Nested buttons example</h2>
-
-<pre><code class="javascript language-javascript">var choo = require('choo')
+  	<pre><code class="javascript language-javascript">
+var choo = require('choo')
 var html = require('choo/html')
 var Nanocomponent = require('nanocomponent')
 
@@ -89,7 +112,8 @@ function mainView (state, emit) {
   ${bm.render(state.buttons)}
   &lt;/body&gt;`
 }
-</code></pre>
+  	</code></pre>
+  </div>
 
 	<script src="bundle.js"></script>
 </body>

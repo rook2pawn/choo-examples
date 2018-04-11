@@ -25,8 +25,16 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route('/choo-examples', mainView)
-app.mount('div#main')
+app.route(baseRoute(), mainView)
+app.mount('div#nestedbuttonsexample')
+
+function baseRoute() {
+  let isLocal = true;
+  if (isLocal)
+    return "/"
+  else
+    return "/choo-examples"
+}
 
 },{"./buttonManager":3,"./getRandomColor":4,"choo":12,"choo/html":11}],2:[function(require,module,exports){
 const html = require('choo/html')

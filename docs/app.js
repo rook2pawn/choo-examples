@@ -24,5 +24,13 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route('/choo-examples', mainView)
-app.mount('div#main')
+app.route(baseRoute(), mainView)
+app.mount('div#nestedbuttonsexample')
+
+function baseRoute() {
+  let isLocal = true;
+  if (isLocal)
+    return "/"
+  else
+    return "/choo-examples"
+}
