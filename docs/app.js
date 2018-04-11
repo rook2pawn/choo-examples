@@ -24,5 +24,5 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route(window.location.pathname, mainView)
+app.route('/choo-examples', mainView)
 app.mount('body')

@@ -25,7 +25,7 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route(window.location.pathname, mainView)
+app.route('/choo-examples', mainView)
 app.mount('body')
 
 },{"./buttonManager":3,"./getRandomColor":4,"choo":12,"choo/html":11}],2:[function(require,module,exports){
