@@ -8,9 +8,9 @@ var bm = new ButtonManager;
 var app = choo()
 
 function mainView (state, emit) {
-  return html`<body>
+  return html`<div id='main'>
   ${bm.render(state.buttons)}
-  </body>`
+  </div>`
 }
 
 
