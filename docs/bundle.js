@@ -25,11 +25,11 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route(window.location.pathname || "/", mainView)
+app.route(baseRoute(), mainView)
 app.mount('div#nestedbuttonsexample')
 
 function baseRoute() {
-  let isLocal = true;
+  var isLocal = (window.location.origin == "file://")
   if (isLocal)
     return "/"
   else
