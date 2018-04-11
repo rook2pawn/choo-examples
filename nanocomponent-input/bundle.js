@@ -1,88 +1,54 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-var choo = require('choo')
 var html = require('choo/html')
-var Nanocomponent = require('nanocomponent')
+var choo = require('choo')
+const Nanocomponent = require('nanocomponent')
 
-class Button extends Nanocomponent {
+class TitleComponent extends Nanocomponent {
   constructor () {
     super()
-    this.button = null
+    this.title = null
   }
 
-  createElement (button) {
-    // important we use a copy because if we change state
-    // later we don't want that to effect this directly
-    this.button = Object.assign({}, button);
-    return html`
-      <button style="background-color: ${button.backgroundColor}; color: ${button.color}">
-        Click Me
-      </button>
-    `
+  createElement (title) {
+    this.title = title;
+    return html`<h1>${title}</h1>`
   }
 
-  update (newButton) {
-    return newButton.backgroundColor !== this.button.backgroundColor
+  update (title) {
+    return title !== this.title
   }
 }
-
-class ButtonManager extends Nanocomponent {
-  constructor () {
-    super()
-    this.buttons = null
-  }
-
-  createElement (buttons) {
-    this.buttons = buttons.map((button) => new Button)
-    return html`<div>${this.buttons.map((button,idx) => button.render(buttons[idx]))}</div>`
-  }
-
-  update (newButtons) {
-    newButtons.forEach((newButton,idx) => {
-      this.buttons[idx].render(newButton)
-    })
-    return false;
-  }
-}
-
-var bm = new ButtonManager;
 var app = choo()
+app.use(titleStore)
 app.route('/', mainView)
 app.mount('body')
 
-
-var mr = require('mrcolor');
-const invert = require('invert-color');
-
-var getColor = mr();
-const getRandomColor = function() {
-  var color = getColor().rgb();
-
-  var foregroundColor= invert(color)
-  var backgroundColor = `rgb(${color.join(',')})`;
-  return {foregroundColor, backgroundColor}
-}
-
-app.use((state, emitter) => {
-  state.buttons = [];
-  for (var i = 0; i < 5; i++) {
-    let colorObj = getRandomColor();
-    state.buttons.push({color:colorObj.foregroundColor, backgroundColor:colorObj.backgroundColor})
-  }
-  setInterval(() => {
-    const index = ~~(Math.random()*state.buttons.length)
-    const colorObj = getRandomColor();
-    state.buttons[index].color = colorObj.foregroundColor;
-    state.buttons[index].backgroundColor = colorObj.backgroundColor;
-    emitter.emit('render');
-  }, 500)
-})
+var title = new TitleComponent;
 function mainView (state, emit) {
-  return html`<body>
-  ${bm.render(state.buttons)}
-  </body>`
+  return html`
+    <body>
+    <h1>${title.render(state.title)}</h1>
+    <input
+      type="text"
+      value="${state.title}"
+      oninput=${oninput} />
+    </body>
+  `
+
+  function oninput (e) {
+    emit('update', e.target.value)
+  }
 }
 
-},{"choo":9,"choo/html":8,"invert-color":17,"mrcolor":18,"nanocomponent":21}],2:[function(require,module,exports){
+function titleStore (state, emitter) {
+  state.title = "Set the title"
+  emitter.on('update', function (title) {
+    state.title = title;
+    emitter.emit('render')
+  })
+}
+
+},{"choo":9,"choo/html":8,"nanocomponent":17}],2:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -576,7 +542,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":38}],3:[function(require,module,exports){
+},{"util/":34}],3:[function(require,module,exports){
 var trailingNewlineRegex = /\n[\s]+$/
 var leadingNewlineRegex = /^\n[\s]+/
 var trailingSpaceRegex = /[\s]+$/
@@ -810,7 +776,7 @@ module.exports = hyperx(belCreateElement, {comments: true})
 module.exports.default = module.exports
 module.exports.createElement = belCreateElement
 
-},{"./appendChild":3,"hyperx":16}],5:[function(require,module,exports){
+},{"./appendChild":3,"hyperx":14}],5:[function(require,module,exports){
 
 },{}],6:[function(require,module,exports){
 // shim for using process in browser
@@ -1041,7 +1007,7 @@ function newCall (Cls) {
   return new (Cls.bind.apply(Cls, arguments)) // eslint-disable-line
 }
 
-},{"assert":2,"nanolru":24}],8:[function(require,module,exports){
+},{"assert":2,"nanolru":20}],8:[function(require,module,exports){
 module.exports = require('bel')
 
 },{"bel":4}],9:[function(require,module,exports){
@@ -1313,539 +1279,7 @@ Choo.prototype._setCache = function (state) {
   }
 }
 
-},{"./component/cache":7,"assert":2,"document-ready":12,"nanobus":20,"nanohref":22,"nanolocation":23,"nanomorph":25,"nanoquery":28,"nanoraf":29,"nanorouter":30,"nanotiming":32,"scroll-to-anchor":35,"xtend":41}],10:[function(require,module,exports){
-/* MIT license */
-
-module.exports = {
-  rgb2hsl: rgb2hsl,
-  rgb2hsv: rgb2hsv,
-  rgb2cmyk: rgb2cmyk,
-  rgb2keyword: rgb2keyword,
-  rgb2xyz: rgb2xyz,
-  rgb2lab: rgb2lab,
-
-  hsl2rgb: hsl2rgb,
-  hsl2hsv: hsl2hsv,
-  hsl2cmyk: hsl2cmyk,
-  hsl2keyword: hsl2keyword,
-
-  hsv2rgb: hsv2rgb,
-  hsv2hsl: hsv2hsl,
-  hsv2cmyk: hsv2cmyk,
-  hsv2keyword: hsv2keyword,
-
-  cmyk2rgb: cmyk2rgb,
-  cmyk2hsl: cmyk2hsl,
-  cmyk2hsv: cmyk2hsv,
-  cmyk2keyword: cmyk2keyword,
-  
-  keyword2rgb: keyword2rgb,
-  keyword2hsl: keyword2hsl,
-  keyword2hsv: keyword2hsv,
-  keyword2cmyk: keyword2cmyk,
-  
-  xyz2rgb: xyz2rgb,
-}
-
-
-function rgb2hsl(rgb) {
-  var r = rgb[0]/255,
-      g = rgb[1]/255,
-      b = rgb[2]/255,
-      min = Math.min(r, g, b),
-      max = Math.max(r, g, b),
-      delta = max - min,
-      h, s, l;
-
-  if (max == min)
-    h = 0;
-  else if (r == max) 
-    h = (g - b) / delta; 
-  else if (g == max)
-    h = 2 + (b - r) / delta; 
-  else if (b == max)
-    h = 4 + (r - g)/ delta;
-
-  h = Math.min(h * 60, 360);
-
-  if (h < 0)
-    h += 360;
-
-  l = (min + max) / 2;
-
-  if (max == min)
-    s = 0;
-  else if (l <= 0.5)
-    s = delta / (max + min);
-  else
-    s = delta / (2 - max - min);
-
-  return [h, s * 100, l * 100];
-}
-
-function rgb2hsv(rgb) {
-  var r = rgb[0],
-      g = rgb[1],
-      b = rgb[2],
-      min = Math.min(r, g, b),
-      max = Math.max(r, g, b),
-      delta = max - min,
-      h, s, v;
-
-  if (max == 0)
-    s = 0;
-  else
-    s = (delta/max * 1000)/10;
-
-  if (max == min)
-    h = 0;
-  else if (r == max) 
-    h = (g - b) / delta; 
-  else if (g == max)
-    h = 2 + (b - r) / delta; 
-  else if (b == max)
-    h = 4 + (r - g) / delta;
-
-  h = Math.min(h * 60, 360);
-
-  if (h < 0) 
-    h += 360;
-
-  v = ((max / 255) * 1000) / 10;
-
-  return [h, s, v];
-}
-
-function rgb2cmyk(rgb) {
-  var r = rgb[0] / 255,
-      g = rgb[1] / 255,
-      b = rgb[2] / 255,
-      c, m, y, k;
-      
-  k = Math.min(1 - r, 1 - g, 1 - b);
-  c = (1 - r - k) / (1 - k);
-  m = (1 - g - k) / (1 - k);
-  y = (1 - b - k) / (1 - k);
-  return [c * 100, m * 100, y * 100, k * 100];
-}
-
-function rgb2keyword(rgb) {
-  return reverseKeywords[JSON.stringify(rgb)];
-}
-
-function rgb2xyz(rgb) {
-  var r = rgb[0] / 255,
-      g = rgb[1] / 255,
-      b = rgb[2] / 255;
-
-  // assume sRGB
-  r = r > 0.04045 ? Math.pow(((r + 0.055) / 1.055), 2.4) : (r / 12.92);
-  g = g > 0.04045 ? Math.pow(((g + 0.055) / 1.055), 2.4) : (g / 12.92);
-  b = b > 0.04045 ? Math.pow(((b + 0.055) / 1.055), 2.4) : (b / 12.92);
-  
-  var x = (r * 0.4124) + (g * 0.3576) + (b * 0.1805);
-  var y = (r * 0.2126) + (g * 0.7152) + (b * 0.0722);
-  var z = (r * 0.0193) + (g * 0.1192) + (b * 0.9505);
-
-  return [x * 100, y *100, z * 100];
-}
-
-function rgb2lab(rgb) {
-  var xyz = rgb2xyz(rgb),
-        x = xyz[0],
-        y = xyz[1],
-        z = xyz[2],
-        l, a, b;
-
-  x /= 95.047;
-  y /= 100;
-  z /= 108.883;
-
-  x = x > 0.008856 ? Math.pow(x, 1/3) : (7.787 * x) + (16 / 116);
-  y = y > 0.008856 ? Math.pow(y, 1/3) : (7.787 * y) + (16 / 116);
-  z = z > 0.008856 ? Math.pow(z, 1/3) : (7.787 * z) + (16 / 116);
-
-  l = (116 * y) - 16;
-  a = 500 * (x - y);
-  b = 200 * (y - z);
-  
-  return [l, a, b];
-}
-
-
-function hsl2rgb(hsl) {
-  var h = hsl[0] / 360,
-      s = hsl[1] / 100,
-      l = hsl[2] / 100,
-      t1, t2, t3, rgb, val;
-
-  if (s == 0) {
-    val = l * 255;
-    return [val, val, val];
-  }
-
-  if (l < 0.5)
-    t2 = l * (1 + s);
-  else
-    t2 = l + s - l * s;
-  t1 = 2 * l - t2;
-
-  rgb = [0, 0, 0];
-  for (var i = 0; i < 3; i++) {
-    t3 = h + 1 / 3 * - (i - 1);
-    t3 < 0 && t3++;
-    t3 > 1 && t3--;
-
-    if (6 * t3 < 1)
-      val = t1 + (t2 - t1) * 6 * t3;
-    else if (2 * t3 < 1)
-      val = t2;
-    else if (3 * t3 < 2)
-      val = t1 + (t2 - t1) * (2 / 3 - t3) * 6;
-    else
-      val = t1;
-
-    rgb[i] = val * 255;
-  }
-  
-  return rgb;
-}
-
-function hsl2hsv(hsl) {
-  var h = hsl[0],
-      s = hsl[1] / 100,
-      l = hsl[2] / 100,
-      sv, v;
-  l *= 2;
-  s *= (l <= 1) ? l : 2 - l;
-  v = (l + s) / 2;
-  sv = (2 * s) / (l + s);
-  return [h, s * 100, v * 100];
-}
-
-function hsl2cmyk(args) {
-  return rgb2cmyk(hsl2rgb(args));
-}
-
-function hsl2keyword(args) {
-  return rgb2keyword(hsl2rgb(args));
-}
-
-
-function hsv2rgb(hsv) {
-  var h = hsv[0] / 60,
-      s = hsv[1] / 100,
-      v = hsv[2] / 100,
-      hi = Math.floor(h) % 6;
-
-  var f = h - Math.floor(h),
-      p = 255 * v * (1 - s),
-      q = 255 * v * (1 - (s * f)),
-      t = 255 * v * (1 - (s * (1 - f))),
-      v = 255 * v;
-
-  switch(hi) {
-    case 0:
-      return [v, t, p];
-    case 1:
-      return [q, v, p];
-    case 2:
-      return [p, v, t];
-    case 3:
-      return [p, q, v];
-    case 4:
-      return [t, p, v];
-    case 5:
-      return [v, p, q];
-  }
-}
-
-function hsv2hsl(hsv) {
-  var h = hsv[0],
-      s = hsv[1] / 100,
-      v = hsv[2] / 100,
-      sl, l;
-
-  l = (2 - s) * v;  
-  sl = s * v;
-  sl /= (l <= 1) ? l : 2 - l;
-  l /= 2;
-  return [h, sl * 100, l * 100];
-}
-
-function hsv2cmyk(args) {
-  return rgb2cmyk(hsv2rgb(args));
-}
-
-function hsv2keyword(args) {
-  return rgb2keyword(hsv2rgb(args));
-}
-
-function cmyk2rgb(cmyk) {
-  var c = cmyk[0] / 100,
-      m = cmyk[1] / 100,
-      y = cmyk[2] / 100,
-      k = cmyk[3] / 100,
-      r, g, b;
-
-  r = 1 - Math.min(1, c * (1 - k) + k);
-  g = 1 - Math.min(1, m * (1 - k) + k);
-  b = 1 - Math.min(1, y * (1 - k) + k);
-  return [r * 255, g * 255, b * 255];
-}
-
-function cmyk2hsl(args) {
-  return rgb2hsl(cmyk2rgb(args));
-}
-
-function cmyk2hsv(args) {
-  return rgb2hsv(cmyk2rgb(args));
-}
-
-function cmyk2keyword(args) {
-  return rgb2keyword(cmyk2rgb(args));
-}
-
-
-function xyz2rgb(xyz) {
-  var x = xyz[0] / 100,
-      y = xyz[1] / 100,
-      z = xyz[2] / 100,
-      r, g, b;
-
-  r = (x * 3.2406) + (y * -1.5372) + (z * -0.4986);
-  g = (x * -0.9689) + (y * 1.8758) + (z * 0.0415);
-  b = (x * 0.0557) + (y * -0.2040) + (z * 1.0570);
-
-  // assume sRGB
-  r = r > 0.0031308 ? ((1.055 * Math.pow(r, 1.0 / 2.4)) - 0.055)
-    : r = (r * 12.92);
-
-  g = g > 0.0031308 ? ((1.055 * Math.pow(g, 1.0 / 2.4)) - 0.055)
-    : g = (g * 12.92);
-        
-  b = b > 0.0031308 ? ((1.055 * Math.pow(b, 1.0 / 2.4)) - 0.055)
-    : b = (b * 12.92);
-
-  r = (r < 0) ? 0 : r;
-  g = (g < 0) ? 0 : g;
-  b = (b < 0) ? 0 : b;
-
-  return [r * 255, g * 255, b * 255];
-}
-
-
-function keyword2rgb(keyword) {
-  return cssKeywords[keyword];
-}
-
-function keyword2hsl(args) {
-  return rgb2hsl(keyword2rgb(args));
-}
-
-function keyword2hsv(args) {
-  return rgb2hsv(keyword2rgb(args));
-}
-
-function keyword2cmyk(args) {
-  return rgb2cmyk(keyword2rgb(args));
-}
-
-var cssKeywords = {
-  aliceblue:  [240,248,255],
-  antiquewhite: [250,235,215],
-  aqua: [0,255,255],
-  aquamarine: [127,255,212],
-  azure:  [240,255,255],
-  beige:  [245,245,220],
-  bisque: [255,228,196],
-  black:  [0,0,0],
-  blanchedalmond: [255,235,205],
-  blue: [0,0,255],
-  blueviolet: [138,43,226],
-  brown:  [165,42,42],
-  burlywood:  [222,184,135],
-  cadetblue:  [95,158,160],
-  chartreuse: [127,255,0],
-  chocolate:  [210,105,30],
-  coral:  [255,127,80],
-  cornflowerblue: [100,149,237],
-  cornsilk: [255,248,220],
-  crimson:  [220,20,60],
-  cyan: [0,255,255],
-  darkblue: [0,0,139],
-  darkcyan: [0,139,139],
-  darkgoldenrod:  [184,134,11],
-  darkgray: [169,169,169],
-  darkgreen:  [0,100,0],
-  darkgrey: [169,169,169],
-  darkkhaki:  [189,183,107],
-  darkmagenta:  [139,0,139],
-  darkolivegreen: [85,107,47],
-  darkorange: [255,140,0],
-  darkorchid: [153,50,204],
-  darkred:  [139,0,0],
-  darksalmon: [233,150,122],
-  darkseagreen: [143,188,143],
-  darkslateblue:  [72,61,139],
-  darkslategray:  [47,79,79],
-  darkslategrey:  [47,79,79],
-  darkturquoise:  [0,206,209],
-  darkviolet: [148,0,211],
-  deeppink: [255,20,147],
-  deepskyblue:  [0,191,255],
-  dimgray:  [105,105,105],
-  dimgrey:  [105,105,105],
-  dodgerblue: [30,144,255],
-  firebrick:  [178,34,34],
-  floralwhite:  [255,250,240],
-  forestgreen:  [34,139,34],
-  fuchsia:  [255,0,255],
-  gainsboro:  [220,220,220],
-  ghostwhite: [248,248,255],
-  gold: [255,215,0],
-  goldenrod:  [218,165,32],
-  gray: [128,128,128],
-  green:  [0,128,0],
-  greenyellow:  [173,255,47],
-  grey: [128,128,128],
-  honeydew: [240,255,240],
-  hotpink:  [255,105,180],
-  indianred:  [205,92,92],
-  indigo: [75,0,130],
-  ivory:  [255,255,240],
-  khaki:  [240,230,140],
-  lavender: [230,230,250],
-  lavenderblush:  [255,240,245],
-  lawngreen:  [124,252,0],
-  lemonchiffon: [255,250,205],
-  lightblue:  [173,216,230],
-  lightcoral: [240,128,128],
-  lightcyan:  [224,255,255],
-  lightgoldenrodyellow: [250,250,210],
-  lightgray:  [211,211,211],
-  lightgreen: [144,238,144],
-  lightgrey:  [211,211,211],
-  lightpink:  [255,182,193],
-  lightsalmon:  [255,160,122],
-  lightseagreen:  [32,178,170],
-  lightskyblue: [135,206,250],
-  lightslategray: [119,136,153],
-  lightslategrey: [119,136,153],
-  lightsteelblue: [176,196,222],
-  lightyellow:  [255,255,224],
-  lime: [0,255,0],
-  limegreen:  [50,205,50],
-  linen:  [250,240,230],
-  magenta:  [255,0,255],
-  maroon: [128,0,0],
-  mediumaquamarine: [102,205,170],
-  mediumblue: [0,0,205],
-  mediumorchid: [186,85,211],
-  mediumpurple: [147,112,219],
-  mediumseagreen: [60,179,113],
-  mediumslateblue:  [123,104,238],
-  mediumspringgreen:  [0,250,154],
-  mediumturquoise:  [72,209,204],
-  mediumvioletred:  [199,21,133],
-  midnightblue: [25,25,112],
-  mintcream:  [245,255,250],
-  mistyrose:  [255,228,225],
-  moccasin: [255,228,181],
-  navajowhite:  [255,222,173],
-  navy: [0,0,128],
-  oldlace:  [253,245,230],
-  olive:  [128,128,0],
-  olivedrab:  [107,142,35],
-  orange: [255,165,0],
-  orangered:  [255,69,0],
-  orchid: [218,112,214],
-  palegoldenrod:  [238,232,170],
-  palegreen:  [152,251,152],
-  paleturquoise:  [175,238,238],
-  palevioletred:  [219,112,147],
-  papayawhip: [255,239,213],
-  peachpuff:  [255,218,185],
-  peru: [205,133,63],
-  pink: [255,192,203],
-  plum: [221,160,221],
-  powderblue: [176,224,230],
-  purple: [128,0,128],
-  red:  [255,0,0],
-  rosybrown:  [188,143,143],
-  royalblue:  [65,105,225],
-  saddlebrown:  [139,69,19],
-  salmon: [250,128,114],
-  sandybrown: [244,164,96],
-  seagreen: [46,139,87],
-  seashell: [255,245,238],
-  sienna: [160,82,45],
-  silver: [192,192,192],
-  skyblue:  [135,206,235],
-  slateblue:  [106,90,205],
-  slategray:  [112,128,144],
-  slategrey:  [112,128,144],
-  snow: [255,250,250],
-  springgreen:  [0,255,127],
-  steelblue:  [70,130,180],
-  tan:  [210,180,140],
-  teal: [0,128,128],
-  thistle:  [216,191,216],
-  tomato: [255,99,71],
-  turquoise:  [64,224,208],
-  violet: [238,130,238],
-  wheat:  [245,222,179],
-  white:  [255,255,255],
-  whitesmoke: [245,245,245],
-  yellow: [255,255,0],
-  yellowgreen:  [154,205,50]
-};
-
-var reverseKeywords = {};
-for (var key in cssKeywords) {
-  reverseKeywords[JSON.stringify(cssKeywords[key])] = key;
-}
-
-},{}],11:[function(require,module,exports){
-var conversions = require("./conversions");
-
-var exports = {};
-module.exports = exports;
-
-for (var func in conversions) {
-  // export rgb2hslRaw
-  exports[func + "Raw"] =  (function(func) {
-    // accept array or plain args
-    return function(arg) {
-      if (typeof arg == "number")
-        arg = Array.prototype.slice.call(arguments);
-      return conversions[func](arg);
-    }
-  })(func);
-
-  var pair = /(\w+)2(\w+)/.exec(func),
-      from = pair[1],
-      to = pair[2];
-
-  // export rgb2hsl and ["rgb"]["hsl"]
-  exports[from] = exports[from] || {};
-
-  exports[from][to] = exports[func] = (function(func) { 
-    return function(arg) {
-      if (typeof arg == "number")
-        arg = Array.prototype.slice.call(arguments);
-      
-      var val = conversions[func](arg);
-      if (typeof val == "string" || val === undefined)
-        return val; // keyword
-
-      for (var i = 0; i < val.length; i++)
-        val[i] = Math.round(val[i]);
-      return val;
-    }
-  })(func);
-}
-},{"./conversions":10}],12:[function(require,module,exports){
+},{"./component/cache":7,"assert":2,"document-ready":10,"nanobus":16,"nanohref":18,"nanolocation":19,"nanomorph":21,"nanoquery":24,"nanoraf":25,"nanorouter":26,"nanotiming":28,"scroll-to-anchor":31,"xtend":37}],10:[function(require,module,exports){
 'use strict'
 
 var assert = require('assert')
@@ -1864,7 +1298,7 @@ function ready (callback) {
   })
 }
 
-},{"assert":2}],13:[function(require,module,exports){
+},{"assert":2}],11:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -1885,7 +1319,7 @@ if (typeof document !== 'undefined') {
 module.exports = doccy;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":5}],14:[function(require,module,exports){
+},{"min-document":5}],12:[function(require,module,exports){
 (function (global){
 var win;
 
@@ -1902,7 +1336,7 @@ if (typeof window !== "undefined") {
 module.exports = win;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],15:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = attributeToProperty
 
 var transform = {
@@ -1923,7 +1357,7 @@ function attributeToProperty (h) {
   }
 }
 
-},{}],16:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var attrToProp = require('hyperscript-attribute-to-property')
 
 var VAR = 0, TEXT = 1, OPEN = 2, CLOSE = 3, ATTR = 4
@@ -2219,91 +1653,7 @@ var closeRE = RegExp('^(' + [
 ].join('|') + ')(?:[\.#][a-zA-Z0-9\u007F-\uFFFF_:-]+)*$')
 function selfClosing (tag) { return closeRE.test(tag) }
 
-},{"hyperscript-attribute-to-property":15}],17:[function(require,module,exports){
-!function(t,n){"object"==typeof exports&&"object"==typeof module?module.exports=n():"function"==typeof define&&define.amd?define("invert",[],n):"object"==typeof exports?exports.invert=n():t.invert=n()}("undefined"!=typeof self?self:this,function(){return function(t){function n(e){if(r[e])return r[e].exports;var o=r[e]={i:e,l:!1,exports:{}};return t[e].call(o.exports,o,o.exports,n),o.l=!0,o.exports}var r={};return n.m=t,n.c=r,n.d=function(t,r,e){n.o(t,r)||Object.defineProperty(t,r,{configurable:!1,enumerable:!0,get:e})},n.n=function(t){var r=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(r,"a",r),r},n.o=function(t,n){return Object.prototype.hasOwnProperty.call(t,n)},n.p="lib/",n(n.s=0)}([function(t,n,r){"use strict";function e(t,n){return n=n||2,(new Array(n).join("0")+t).slice(-n)}function o(t){return{r:t[0],g:t[1],b:t[2]}}function i(t){if("#"===t.slice(0,1)&&(t=t.slice(1)),!l.test(t))throw new Error('Invalid HEX color: "'+t+'"');return 3===t.length&&(t=t[0]+t[0]+t[1]+t[1]+t[2]+t[2]),[parseInt(t.slice(0,2),16),parseInt(t.slice(2,4),16),parseInt(t.slice(4,6),16)]}function u(t){if(!t)throw new Error("Invalid color value");return Array.isArray(t)?t:"string"==typeof t?i(t):[t.r,t.g,t.b]}function f(t){var n=void 0,r=void 0,e=[];for(n=0;n<t.length;n++)r=t[n]/255,e[n]=r<=.03928?r/12.92:Math.pow((r+.055)/1.055,2.4);return.2126*e[0]+.7152*e[1]+.0722*e[2]}function c(t,n,r){var e=!0===n?p:Object.assign({},p,n);return f(t)>s?r?i(e.black):e.black:r?i(e.white):e.white}function a(t,n){return t=u(t),n?c(t,n):"#"+t.map(function(t){return e((255-t).toString(16))}).join("")}var s=Math.sqrt(1.05*.05)-.05,l=/^(?:[0-9a-f]{3}){1,2}$/i,p={black:"#000000",white:"#ffffff"};a.asRgbArray=function(t,n){return t=u(t),n?c(t,n,!0):t.map(function(t){return 255-t})},a.asRgbObject=function(t,n){return t=u(t),o(n?c(t,n,!0):t.map(function(t){return 255-t}))},t.exports=a}])});
-
-},{}],18:[function(require,module,exports){
-var convert = require('color-convert');
-
-var mr = module.exports = function () {
-    var used = [];
-    var num = 0;
-    var last = [];
-    
-    return function next () {
-        var angle;
-        if (num < 6) {
-            angle = 60 * num;
-            used.push(angle);
-            if (num === 5) used.push(360);
-        }
-        else {
-            var dxs = used.slice(1).map(function (u, i) {
-                return (u - used[i]) * last.every(function (x) {
-                    return Math.abs(u - x) > 60
-                        && Math.abs((u - 360) - x) > 60
-                    ;
-                });
-            });
-            var ix = dxs.indexOf(Math.max.apply(null, dxs));
-            
-            var x = used[ix];
-            var y = used[ix+1];
-            angle = Math.floor(x + (y - x) / 2);
-            used.splice(ix + 1, 0, angle);
-        }
-        
-        num ++;
-        last = [angle].concat(last).slice(0,4);
-        
-        return mr.fromHSL(
-            angle,
-            100 - Math.min(80, 1 / Math.sqrt(1 + Math.floor(num / 12)))
-                * Math.random(),
-            50 + Math.min(80, (Math.floor(num / 6) * 20))
-                * (Math.random() - 0.5)
-        );
-    };
-};
-
-mr.fromHSL = function (h, s, l) {
-    if (!s) s = 100;
-    if (!l) l = 50;
-    var hsl = [ h, s, l ];
-    
-    return {
-        rgb : function () {
-            return convert.hsl2rgb(hsl);
-        },
-        hsl : function () {
-            return hsl;
-        },
-        hsv : function () {
-            return convert.hsl2hsv(hsl)
-        },
-        cmyk : function () {
-            return convert.hsl2cmyk(hsl)
-        },
-        xyz : function () {
-            return convert.hsl2xyz(hsl)
-        }
-    };
-};
-
-mr.take = function (n) {
-    if (n <= 0) return [];
-    
-    var res = [];
-    var next = mr();
-    
-    for (var i = 0; i < n; i++) {
-        res.push(next());
-    }
-    
-    return res;
-};
-
-},{"color-convert":11}],19:[function(require,module,exports){
+},{"hyperscript-attribute-to-property":13}],15:[function(require,module,exports){
 assert.notEqual = notEqual
 assert.notOk = notOk
 assert.equal = equal
@@ -2327,7 +1677,7 @@ function assert (t, m) {
   if (!t) throw new Error(m || 'AssertionError')
 }
 
-},{}],20:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var splice = require('remove-array-items')
 var nanotiming = require('nanotiming')
 var assert = require('assert')
@@ -2491,7 +1841,7 @@ Nanobus.prototype._emit = function (arr, eventName, data, uuid) {
   }
 }
 
-},{"assert":2,"nanotiming":32,"remove-array-items":34}],21:[function(require,module,exports){
+},{"assert":2,"nanotiming":28,"remove-array-items":30}],17:[function(require,module,exports){
 var document = require('global/document')
 var nanotiming = require('nanotiming')
 var morph = require('nanomorph')
@@ -2647,7 +1997,7 @@ Nanocomponent.prototype.update = function () {
   throw new Error('nanocomponent: update should be implemented!')
 }
 
-},{"assert":19,"global/document":13,"nanomorph":25,"nanotiming":32,"on-load":33}],22:[function(require,module,exports){
+},{"assert":15,"global/document":11,"nanomorph":21,"nanotiming":28,"on-load":29}],18:[function(require,module,exports){
 var assert = require('assert')
 
 var safeExternalLink = /(noopener|noreferrer) (noopener|noreferrer)/
@@ -2689,7 +2039,7 @@ function href (cb, root) {
   })
 }
 
-},{"assert":2}],23:[function(require,module,exports){
+},{"assert":2}],19:[function(require,module,exports){
 var assert = require('assert')
 
 module.exports = nanolocation
@@ -2701,7 +2051,7 @@ function nanolocation () {
   return pathname + hash
 }
 
-},{"assert":2}],24:[function(require,module,exports){
+},{"assert":2}],20:[function(require,module,exports){
 module.exports = LRU
 
 function LRU (opts) {
@@ -2839,7 +2189,7 @@ LRU.prototype.evict = function () {
   this.remove(this.tail)
 }
 
-},{}],25:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var assert = require('assert')
 var morph = require('./lib/morph')
 
@@ -2990,7 +2340,7 @@ function same (a, b) {
   return false
 }
 
-},{"./lib/morph":27,"assert":19}],26:[function(require,module,exports){
+},{"./lib/morph":23,"assert":15}],22:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3034,7 +2384,7 @@ module.exports = [
   'onfocusout'
 ]
 
-},{}],27:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var events = require('./events')
 var eventsLength = events.length
 
@@ -3200,7 +2550,7 @@ function updateAttribute (newNode, oldNode, name) {
   }
 }
 
-},{"./events":26}],28:[function(require,module,exports){
+},{"./events":22}],24:[function(require,module,exports){
 var reg = /([^?=&]+)(=([^&]*))?/g
 var assert = require('assert')
 
@@ -3217,7 +2567,7 @@ function qs (url) {
   return obj
 }
 
-},{"assert":19}],29:[function(require,module,exports){
+},{"assert":15}],25:[function(require,module,exports){
 'use strict'
 
 var assert = require('assert')
@@ -3254,7 +2604,7 @@ function nanoraf (render, raf) {
   }
 }
 
-},{"assert":2}],30:[function(require,module,exports){
+},{"assert":2}],26:[function(require,module,exports){
 var assert = require('assert')
 var wayfarer = require('wayfarer')
 
@@ -3310,7 +2660,7 @@ function pathname (routename, isElectron) {
   return decodeURI(routename.replace(suffix, '').replace(normalize, '/'))
 }
 
-},{"assert":2,"wayfarer":39}],31:[function(require,module,exports){
+},{"assert":2,"wayfarer":35}],27:[function(require,module,exports){
 var assert = require('assert')
 
 var hasWindow = typeof window !== 'undefined'
@@ -3367,7 +2717,7 @@ NanoScheduler.prototype.setTimeout = function (cb) {
 
 module.exports = createScheduler
 
-},{"assert":19}],32:[function(require,module,exports){
+},{"assert":15}],28:[function(require,module,exports){
 var scheduler = require('nanoscheduler')()
 var assert = require('assert')
 
@@ -3417,7 +2767,7 @@ function noop (cb) {
   }
 }
 
-},{"assert":2,"nanoscheduler":31}],33:[function(require,module,exports){
+},{"assert":2,"nanoscheduler":27}],29:[function(require,module,exports){
 /* global MutationObserver */
 var document = require('global/document')
 var window = require('global/window')
@@ -3521,7 +2871,7 @@ function eachMutation (nodes, fn) {
   }
 }
 
-},{"assert":19,"global/document":13,"global/window":14}],34:[function(require,module,exports){
+},{"assert":15,"global/document":11,"global/window":12}],30:[function(require,module,exports){
 'use strict'
 
 /**
@@ -3551,7 +2901,7 @@ module.exports = function removeItems(arr, startIdx, removeCount)
   arr.length = len
 }
 
-},{}],35:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports = scrollToAnchor
 
 function scrollToAnchor (anchor, options) {
@@ -3563,7 +2913,7 @@ function scrollToAnchor (anchor, options) {
   }
 }
 
-},{}],36:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -3588,14 +2938,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],37:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],38:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4185,7 +3535,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":37,"_process":6,"inherits":36}],39:[function(require,module,exports){
+},{"./support/isBuffer":33,"_process":6,"inherits":32}],35:[function(require,module,exports){
 var assert = require('assert')
 var trie = require('./trie')
 
@@ -4259,7 +3609,7 @@ function Wayfarer (dft) {
   }
 }
 
-},{"./trie":40,"assert":2}],40:[function(require,module,exports){
+},{"./trie":36,"assert":2}],36:[function(require,module,exports){
 var mutate = require('xtend/mutable')
 var assert = require('assert')
 var xtend = require('xtend')
@@ -4397,7 +3747,7 @@ Trie.prototype.mount = function (route, trie) {
   }
 }
 
-},{"assert":2,"xtend":41,"xtend/mutable":42}],41:[function(require,module,exports){
+},{"assert":2,"xtend":37,"xtend/mutable":38}],37:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -4418,7 +3768,7 @@ function extend() {
     return target
 }
 
-},{}],42:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;

@@ -3,10 +3,10 @@ var choo = require('choo')
 
 var app = choo()
 app.use(titleStore)
-app.route('/', mainView)
+app.route('/', titleView)
 app.mount('body')
 
-function mainView (state, emit) {
+function titleView (state, emit) {
   return html`
     <body>
     <h1>${state.title}</h1>
