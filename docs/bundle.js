@@ -25,7 +25,7 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route('/', mainView)
+app.route(window.location.pathname, mainView)
 app.mount('body')
 
 },{"./buttonManager":3,"./getRandomColor":4,"choo":12,"choo/html":11}],2:[function(require,module,exports){
@@ -70,11 +70,13 @@ class ButtonManager extends Nanocomponent {
   }
 
   createElement (buttons) {
+    // this is done *once* because we have return false on update
     this.buttons = buttons.map((button) => new Button)
     return html`<div>${this.buttons.map((button,idx) => button.render(buttons[idx]))}</div>`
   }
 
   update (newButtons) {
+    // render children
     newButtons.forEach((newButton,idx) => {
       this.buttons[idx].render(newButton)
     })
