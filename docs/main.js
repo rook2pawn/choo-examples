@@ -75,6 +75,7 @@ function confirmStore(state, emitter) {
   });
 
   emitter.on("cancel", function() {
+    state.submit.field = "";
     state.confirm.button = "waiting";
     emitter.emit("render");
   });
