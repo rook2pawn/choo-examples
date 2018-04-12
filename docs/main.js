@@ -15,8 +15,8 @@ function submitView (state, emit) {
   return html`<div class="container content">${Submission(state,emit)}</div>`
 }
 
-app.use((state, emitter) => {                  // 1.
-  emitter.on('navigate', () => {               // 2.
+app.use((state, emitter) => {
+  emitter.on('navigate', () => {
     switch (state.route) {
       case '*' :
       $('.article').hide();
@@ -39,6 +39,7 @@ app.use((state, emitter) => {                  // 1.
   })
   emitter.on('DOMContentLoaded', () => {
     var hash = window.location.hash;
+    console.log("on load hash:", hash);
     switch (hash) {
       case '' :
         $('div#c1').show()
