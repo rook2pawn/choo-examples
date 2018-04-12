@@ -1,42 +1,4 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const choo = require('choo')
-const html = require('choo/html')
-
-const getRandomColor = require("./getRandomColor")
-const ButtonManager = require("./buttonManager")
-
-var bm = new ButtonManager;
-var app = choo()
-
-function mainView (state, emit) {
-  return html`<div id='main'>
-  ${bm.render(state.buttons)}
-  </div>`
-}
-
-
-app.use((state, emitter) => {
-  state.buttons = Array(5).fill().map(() => getRandomColor());
-  setInterval(() => {
-    const index = ~~(Math.random()*state.buttons.length)
-    const colorObj = getRandomColor();
-    state.buttons[index].color = colorObj.color;
-    state.buttons[index].backgroundColor = colorObj.backgroundColor;
-    emitter.emit('render');
-  }, 500)
-})
-app.route(baseRoute(), mainView)
-app.mount('div#nestedbuttonsexample')
-
-function baseRoute() {
-  var isLocal = (window.location.origin == "file://")
-  if (isLocal)
-    return "/"
-  else
-    return "/choo-examples"
-}
-
-},{"./buttonManager":3,"./getRandomColor":4,"choo":12,"choo/html":11}],2:[function(require,module,exports){
 const html = require('choo/html')
 const Nanocomponent = require('nanocomponent')
 
@@ -64,7 +26,7 @@ class Button extends Nanocomponent {
 
 module.exports = exports = Button
 
-},{"choo/html":11,"nanocomponent":24}],3:[function(require,module,exports){
+},{"choo/html":11,"nanocomponent":24}],2:[function(require,module,exports){
 const html = require('choo/html')
 const Nanocomponent = require('nanocomponent')
 
@@ -94,7 +56,7 @@ class ButtonManager extends Nanocomponent {
 
 module.exports = exports = ButtonManager
 
-},{"./button":2,"choo/html":11,"nanocomponent":24}],4:[function(require,module,exports){
+},{"./button":1,"choo/html":11,"nanocomponent":24}],3:[function(require,module,exports){
 const mr = require('mrcolor');
 const invert = require('invert-color');
 
@@ -109,7 +71,197 @@ const getRandomColor = function() {
 
 module.exports = exports = getRandomColor
 
-},{"invert-color":20,"mrcolor":21}],5:[function(require,module,exports){
+},{"invert-color":20,"mrcolor":21}],4:[function(require,module,exports){
+const choo = require('choo')
+const html = require('choo/html')
+var app = choo()
+
+function mainView (state, emit) {
+  return html`<div class="container content">
+    <h2>Nested buttons example</h2>
+  ${buttonView(state,emit)}
+  </div>`
+}
+function inputView (state, emit) {
+  return html`<div class="container content">${titleView(state,emit)}</div>`
+}
+function submitView (state, emit) {
+  return html`<div class="container content">${Submission(state,emit)}</div>`
+}
+
+app.use((state, emitter) => {                  // 1.
+  emitter.on('navigate', () => {               // 2.
+    switch (state.route) {
+      case '*' :
+      $('.article').hide();
+      $('div#c1').show();
+      break;
+      case 'input-example':
+      $('.article').hide();
+      $('div#c2').show();
+
+      break;
+      case 'submit-confirm':
+      $('.article').hide();
+      $('div#c3').show();
+
+      break;
+      default:
+      break;
+    }
+    console.log(`Navigated to ${state.route}`) // 3.
+  })
+  emitter.on('DOMContentLoaded', () => {
+    var hash = window.location.hash;
+    switch (hash) {
+      case '' :
+        $('div#c1').show()
+      break;
+      case '#input-example':
+        $('div#c2').show()
+
+      break;
+      case '#submit-confirm':
+        $('div#c3').show()
+
+      break;
+      default:
+      break;
+    }
+  })
+
+})
+app.route("/", mainView)
+app.route("#input-example", inputView)
+app.route("#submit-confirm", submitView)
+app.route("/*", mainView)
+
+app.mount('div#appEntry')
+/* SUBMIT CONFIRM */
+
+function confirmStore(state, emitter) {
+  state.confirm = {
+    button: "waiting"
+  };
+  emitter.on("maybe", function() {
+    state.confirm.button = "confirm";
+    emitter.emit("render");
+  });
+
+  emitter.on("cancel", function() {
+    state.confirm.button = "waiting";
+    emitter.emit("render");
+  });
+
+  emitter.on("confirm", function() {
+    state.confirm.button = "waiting";
+    state.submit = {
+      field: "",
+      submitted: state.submit.field
+    };
+    emitter.emit("render");
+  });
+}
+
+function submitStore(state, emitter) {
+  state.submit = {
+    field: "",
+    submitted: ""
+  };
+  emitter.on("setField", function(value) {
+    state.submit.field = value;
+    emitter.emit("render");
+  });
+}
+const Confirm = (state, emit) => {
+  let isWaiting = (state.confirm.button === "waiting");
+  if (isWaiting) {
+    const isDisabled = state.submit.field == "";
+    return html`
+      <button onclick=${() => { emit("maybe") }} disabled=${isDisabled}>Submit</button>`;
+  } else {
+    return html`
+      <span>
+        <button onclick=${() => {
+          emit("cancel");
+        }}>Cancel</button>
+        <button onclick=${() => {
+          emit("confirm");
+        }}>Confirm</button>
+      </span>
+    `;
+  }
+};
+const Submission = (state, emit) => {
+  const onChange = e => {
+    emit("setField", e.target.value);
+  };
+  return html`
+  <div>
+  <h2>Submit confirm example</h2>
+    <input value="${state.submit.field}" oninput=${onChange}/>
+    ${Confirm(state, emit)}
+    <p>Submitted value: ${state.submit.submitted}</p>
+  </div>
+  `;
+};
+app.use(confirmStore);
+app.use(submitStore);
+
+
+/* INPUT EXAMPLE */
+function titleView (state, emit) {
+  return html`
+    <div>
+    <h1>${state.title}</h1>
+    <input
+      type="text"
+      value="${state.title}"
+      oninput=${oninput} />
+    </div>
+  `
+
+  function oninput (e) {
+    emit('update', e.target.value)
+  }
+}
+
+function titleStore (state, emitter) {
+  state.title = "Set the title"
+  emitter.on('update', function (title) {
+    state.title = title;
+    emitter.emit('render')
+  })
+}
+app.use(titleStore)
+
+
+/* BUTTONS EXAMPLE */
+
+const getRandomColor = require("./getRandomColor")
+const ButtonManager = require("./buttonManager")
+
+var bm = new ButtonManager;
+
+function buttonView (state, emit) {
+  return html`<div>
+  ${bm.render(state.buttons)}
+  </div>`
+}
+
+
+app.use((state, emitter) => {
+  state.buttons = Array(5).fill().map(() => getRandomColor());
+  setInterval(() => {
+    const index = ~~(Math.random()*state.buttons.length)
+    const colorObj = getRandomColor();
+    state.buttons[index].color = colorObj.color;
+    state.buttons[index].backgroundColor = colorObj.backgroundColor;
+    emitter.emit('render');
+  }, 500)
+})
+
+},{"./buttonManager":2,"./getRandomColor":3,"choo":12,"choo/html":11}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -4464,4 +4616,4 @@ function extend(target) {
     return target
 }
 
-},{}]},{},[1]);
+},{}]},{},[4]);

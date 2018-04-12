@@ -24,7 +24,7 @@ app.use((state, emitter) => {
     emitter.emit('render');
   }, 500)
 })
-app.route(baseRoute(), mainView)
+app.route("/", mainView)
 app.mount('div#nestedbuttonsexample')
 
 function baseRoute() {
