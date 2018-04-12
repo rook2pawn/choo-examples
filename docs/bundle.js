@@ -132,10 +132,9 @@ app.use((state, emitter) => {
   })
 
 })
-app.route("/", mainView)
-app.route("#input-example", inputView)
-app.route("#submit-confirm", submitView)
-app.route("/*", mainView)
+app.route("/choo-examples", mainView)
+app.route("/choo-examples/#input-example", inputView)
+app.route("/choo-examples/#submit-confirm", submitView)
 
 app.mount('div#appEntry')
 /* SUBMIT CONFIRM */
