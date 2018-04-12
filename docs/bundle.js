@@ -88,20 +88,19 @@ function inputView (state, emit) {
 function submitView (state, emit) {
   return html`<div class="container content">${Submission(state,emit)}</div>`
 }
-
 app.use((state, emitter) => {
   emitter.on('navigate', () => {
     switch (state.route) {
-      case '*' :
+      case 'choo-examples' :
       $('.article').hide();
       $('div#c1').show();
       break;
-      case 'input-example':
+      case 'choo-examples/input-example':
       $('.article').hide();
       $('div#c2').show();
 
       break;
-      case 'submit-confirm':
+      case 'choo-examples/submit-confirm':
       $('.article').hide();
       $('div#c3').show();
 
