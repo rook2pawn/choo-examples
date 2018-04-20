@@ -13,7 +13,6 @@ function mainView (state, emit) {
   </body>`
 }
 
-
 app.use((state, emitter) => {
   state.buttons = Array(5).fill().map(() => getRandomColor());
   setInterval(() => {

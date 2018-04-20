@@ -3,7 +3,6 @@ const Nanocomponent = require('nanocomponent')
 
 const Button = require('./button')
 
-
 class ButtonManager extends Nanocomponent {
   constructor () {
     super()
